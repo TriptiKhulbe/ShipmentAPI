@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = ""
+authors = ["Tripti"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sqlalchemy = "^2.0.31"
+flake8 = "^7.1.0"
+isort = "^5.13.2"
+black = "^24.4.2"
+fastapi = "^0.111.0"
+psycopg2-binary = "^2.9.9"
+python-dotenv = "^1.0.1"
+click = "^8.1.7"
+factory-boy = "^3.3.0"
+uvicorn = "^0.30.1"
+pytest = "^8.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length=80
