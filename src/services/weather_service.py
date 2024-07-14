@@ -14,14 +14,14 @@ class WeatherService(Service):
         self.weather_client = weather_client
 
     def get_weather_detail(self, zip_code: str) -> Optional[TWeather]:
-        weather = (
+        existing_weather = (
             self.session.query(TWeather)
             .filter(TWeather.zip_code == zip_code)
             .first()
         )
 
-        if self.is_valid(weather):
-            return weather
+        if self.is_valid(existing_weather):
+            return existing_weather
 
         self.log.debug(f"requesting weather API in ZIP code - {zip_code}")
         try:
@@ -31,11 +31,11 @@ class WeatherService(Service):
             # API request failed, unable to get the weather info.
             return
 
-        if weather is not None:
-            updated_weather.id = weather.id
-            updated_weather.modified_at = datetime.now(tz=timezone.utc)
-
-        self.session.merge(updated_weather)
+        if existing_weather:
+            self.session.delete(existing_weather)
+            self.session.commit()
+        
+        self.session.add(updated_weather)
         self.session.commit()
 
         return updated_weather
@@ -49,4 +49,7 @@ class WeatherService(Service):
         )
 
     def _is_outdated(self, timestamp: datetime) -> bool:
+        if timestamp.tzinfo is None:
+            # If no timezone is provided, assume it's UTC
+            timestamp = timestamp.replace(tzinfo=timezone.utc)
         return datetime.now(tz=timezone.utc) > timestamp + timedelta(hours=2)
