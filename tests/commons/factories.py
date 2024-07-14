@@ -1,5 +1,4 @@
-from datetime import datetime, timezone
-
+from src.commons.entity import Weather
 from src.commons.models import (
     TAddress,
     TArticle,
@@ -7,7 +6,6 @@ from src.commons.models import (
     TShipment,
     TShipmentDetail,
     TStatusCode,
-    TWeather,
 )
 
 
@@ -71,9 +69,8 @@ def make_article() -> TArticle:
     )
 
 
-def make_weather() -> TWeather:
-    return TWeather(
-        id=1,
+def make_weather() -> Weather:
+    return Weather(
         temp=21.42,
         feels_like=21.84,
         temp_min=20.54,
@@ -83,5 +80,4 @@ def make_weather() -> TWeather:
         description="few clouds",
         units="metric",
         zip_code="zip-code",
-        modified_at=datetime.now(tz=timezone.utc),
     )

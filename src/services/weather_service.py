@@ -1,26 +1,21 @@
-from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from sqlalchemy.orm import Session
-
-from src.commons.models import TWeather
+from src.commons.cache import Cache
+from src.commons.entity import Weather
 from src.commons.weather_client import WeatherClient
 from src.services import Service
 
 
 class WeatherService(Service):
-    def __init__(self, session: Session, weather_client: WeatherClient):
-        super().__init__(session)
+    def __init__(self, weather_client: WeatherClient, cache: Cache):
+        super().__init__()
         self.weather_client = weather_client
+        self.cache = cache
 
-    def get_weather_detail(self, zip_code: str) -> Optional[TWeather]:
-        existing_weather = (
-            self.session.query(TWeather)
-            .filter(TWeather.zip_code == zip_code)
-            .first()
-        )
+    def get_weather_detail(self, zip_code: str) -> Optional[Weather]:
+        existing_weather = self.cache.get(zip_code)
 
-        if self.is_valid(existing_weather):
+        if existing_weather is not None:
             return existing_weather
 
         self.log.debug(f"requesting weather API in ZIP code - {zip_code}")
@@ -31,25 +26,7 @@ class WeatherService(Service):
             # API request failed, unable to get the weather info.
             return
 
-        if existing_weather:
-            self.session.delete(existing_weather)
-            self.session.commit()
-        
-        self.session.add(updated_weather)
-        self.session.commit()
+        # update cache
+        self.cache.set(zip_code, updated_weather)
 
         return updated_weather
-
-    def is_valid(self, weather: TWeather) -> bool:
-        """Checks if the weather info was last updated in less than 2 hours
-        from the time of request.
-        """
-        return (weather is not None) and (
-            not self._is_outdated(weather.modified_at)
-        )
-
-    def _is_outdated(self, timestamp: datetime) -> bool:
-        if timestamp.tzinfo is None:
-            # If no timezone is provided, assume it's UTC
-            timestamp = timestamp.replace(tzinfo=timezone.utc)
-        return datetime.now(tz=timezone.utc) > timestamp + timedelta(hours=2)

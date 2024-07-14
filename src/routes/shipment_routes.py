@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
-from src.commons.dependencies import get_db_session, get_weather_client
+from src.commons.cache import Cache
+from src.commons.dependencies import (
+    get_cache_client,
+    get_db_session,
+    get_weather_client,
+)
 from src.commons.weather_client import WeatherClient
 from src.schemas.shipment_schema import (
     ShipmentDetailRequest,
@@ -18,6 +23,7 @@ shipment_router = APIRouter(prefix="/shipment", tags=["shipment"])
 def get_shipment_detail(
     session: Annotated[Session, Depends(get_db_session)],
     weather_client: Annotated[WeatherClient, Depends(get_weather_client)],
+    cache_client: Annotated[Cache, Depends(get_cache_client)],
     request: ShipmentDetailRequest = Depends(),
 ):
     """Get shipment details along with weather information."""
@@ -27,7 +33,7 @@ def get_shipment_detail(
     )
 
     if shipment_details:
-        weather_service = WeatherService(session, weather_client)
+        weather_service = WeatherService(weather_client, cache_client)
         weather_info = weather_service.get_weather_detail(
             shipment_details[0].shipment.receiver_address.zip_code
         )

@@ -15,7 +15,9 @@ class TArticle(Model):
     price: Mapped[float] = mapped_column(Float)
     sku: Mapped[str] = mapped_column(String(10))
 
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     modified_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
@@ -33,7 +35,9 @@ class TAddress(Model):
     country_name: Mapped[str] = mapped_column(String(20))
     zip_code: Mapped[str] = mapped_column(String(10))
 
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
     def __repr__(self):
         return f"<TAddress-{self.zip_code}>"
@@ -59,10 +63,14 @@ class TShipment(Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     tracking_number: Mapped[str] = mapped_column(String(15), index=True)
 
-    carrier_id: Mapped[int] = mapped_column(Integer, ForeignKey("t_carrier.id"), index=True)
+    carrier_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("t_carrier.id"), index=True
+    )
     carrier = relationship("TCarrier", backref="shipments", uselist=False)
 
-    sender_address_id: Mapped[int] = mapped_column(Integer, ForeignKey("t_address.id"))
+    sender_address_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("t_address.id")
+    )
     sender_address = relationship(
         "TAddress",
         backref="sent_shipments",
@@ -70,7 +78,9 @@ class TShipment(Model):
         uselist=False,
     )
 
-    receiver_address_id: Mapped[int] = mapped_column(Integer, ForeignKey("t_address.id"))
+    receiver_address_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("t_address.id")
+    )
     receiver_address: Mapped[TAddress] = relationship(
         "TAddress",
         backref="received_shipments",
@@ -85,7 +95,9 @@ class TShipment(Model):
         "TStatusCode", backref="shipments", uselist=False
     )
 
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     modified_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
@@ -125,29 +137,9 @@ class TCarrier(Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(20), index=True)
 
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
     def __repr__(self):
         return f"<TCarrier-{self.name}>"
-
-
-class TWeather(Model):
-    __tablename__ = "t_weather"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    temp: Mapped[float] = mapped_column(Float)
-    feels_like: Mapped[float] = mapped_column(Float)
-    temp_min: Mapped[float] = mapped_column(Float)
-    temp_max: Mapped[float] = mapped_column(Float)
-    pressure: Mapped[float] = mapped_column(Float)
-    humidity: Mapped[float] = mapped_column(Float)
-    description: Mapped[str] = mapped_column(String(50))
-    units: Mapped[str] = mapped_column(String(15))  # imperial, metric, standard
-    zip_code: Mapped[str] = mapped_column(String(10), unique=True, index=True)
-    modified_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
-    
-    def __repr__(self):
-        return f"<TWeather-{self.zip_code}>"
-

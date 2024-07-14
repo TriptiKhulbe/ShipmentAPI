@@ -3,14 +3,14 @@ from abc import ABC, abstractmethod
 
 import requests
 
-from src.commons.models import TWeather
+from src.commons.entity import Weather
 
 
 class WeatherClient(ABC):
     TIMEOUT = 10
 
     @abstractmethod
-    def get_weather_info(self, zip_code: str) -> TWeather:
+    def get_weather_info(self, zip_code: str) -> Weather:
         pass
 
 
@@ -22,7 +22,7 @@ class OpenWeather(WeatherClient):
         self.log = logging.getLogger(self.__class__.__name__)
         self.api_key = api_key
 
-    def get_weather_info(self, zip_code: str) -> TWeather:
+    def get_weather_info(self, zip_code: str) -> Weather:
         response = requests.get(
             self.URL,
             params={
@@ -35,7 +35,7 @@ class OpenWeather(WeatherClient):
         response.raise_for_status()
         data = response.json()
 
-        return TWeather(
+        return Weather(
             temp=data["main"]["temp"],
             feels_like=data["main"]["feels_like"],
             temp_min=data["main"]["temp_min"],
