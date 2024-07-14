@@ -10,7 +10,16 @@ from src.routes.shipment_routes import shipment_router
 def create_app() -> FastAPI:
     load_dotenv()
 
-    app = FastAPI()
+    app = FastAPI(
+        title="Track & Trace API",
+        summary="API portal to fetch information of shipments.",
+        version="0.0.1",
+        contact={
+            "name": "Tripti Khulbe",
+            "url": "https://www.linkedin.com/in/tripti-khulbe/",
+            "email": "trip.tk93@gmail.com",
+        },
+    )
     initialize_database(
         username=os.environ["POSTGRES_USER"],
         password=os.environ["POSTGRES_PASSWORD"],

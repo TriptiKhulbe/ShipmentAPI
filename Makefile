@@ -32,4 +32,7 @@ serve:
 
 test:
 	docker compose exec api pytest 
+
+test-cov:
+	docker compose exec api pytest --cov=. --cov-report html
 	

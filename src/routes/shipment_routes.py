@@ -20,6 +20,7 @@ def get_shipment_detail(
     weather_client: Annotated[WeatherClient, Depends(get_weather_client)],
     request: ShipmentDetailRequest = Depends(),
 ):
+    """Get shipment details along with weather information."""
     shipment_service = ShipmentService(session)
     shipment_details = shipment_service.get_shipment_detail(
         request.tracking_number, request.carrier_name

@@ -58,6 +58,7 @@ class WeatherInfoSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     temperature: float = Field(validation_alias="temp")
+    description: str
     feels_like: float
     temp_min: float
     temp_max: float
