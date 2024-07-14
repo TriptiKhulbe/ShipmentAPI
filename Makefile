@@ -24,6 +24,9 @@ init_db:
 clean_db:
 	docker compose exec api python setup.py clean_db 
 
+load_csv:
+	docker compose exec api python setup.py load_csv --filename=data/$(FILENAME)
+
 serve:
 	docker compose exec api python app.py 
 
