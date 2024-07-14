@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from src.commons.database import initialize_database
+from src.routes.shipment_routes import shipment_router
 
 
 def create_app() -> FastAPI:
@@ -32,4 +33,5 @@ def create_app() -> FastAPI:
         database=os.environ["POSTGRES_DB"],
     )
 
+    app.include_router(shipment_router)
     return app

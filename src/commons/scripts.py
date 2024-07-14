@@ -43,7 +43,7 @@ def load_csv(filename: str):
     for _, row in df.iterrows():
         if count_ == 8:
             breakpoint()
-        count_ +=1
+        count_ += 1
         carrier = _get_or_create_carrier(session, row["carrier"])
         article = _get_or_create_article(
             session, row["article_name"], row["article_price"], row["SKU"]
@@ -80,8 +80,10 @@ def _get_or_create_carrier(session: Session, carrier_name: str) -> TCarrier:
 
 
 def _get_or_create_address(session: Session, address: str) -> TAddress:
-    street_name, zip_code_city, country = address.split(",")
-    zip_code, city = zip_code_city.strip().split(" ")
+    street_name, zip_code_city, country = map(
+        lambda x: x.strip(), address.split(",")
+    )
+    zip_code, city = map(lambda x: x.strip(), zip_code_city.strip().split(" "))
     record = (
         session.query(TAddress)
         .filter(
