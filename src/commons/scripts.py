@@ -39,11 +39,7 @@ def load_csv(filename: str):
     session = Database.session()
 
     df = pd.read_csv(filename)
-    count_ = 1
     for _, row in df.iterrows():
-        if count_ == 8:
-            breakpoint()
-        count_ += 1
         carrier = _get_or_create_carrier(session, row["carrier"])
         article = _get_or_create_article(
             session, row["article_name"], row["article_price"], row["SKU"]

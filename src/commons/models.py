@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
 from sqlalchemy.sql import func
 
 Model = declarative_base()
@@ -22,6 +24,21 @@ class TArticle(Model):
         return f"<TArticle-{self.sku}>"
 
 
+class TAddress(Model):
+    __tablename__ = "t_address"
+
+    id = Column(Integer, primary_key=True)
+    street_name = Column(String(100))
+    city_name = Column(String(50))
+    country_name = Column(String(20))
+    zip_code: Mapped[str] = mapped_column(String(10))
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    def __repr__(self):
+        return f"<TAddress-{self.zip_code}>"
+
+
 class TShipment(Model):
     __tablename__ = "t_shipment"
 
@@ -40,7 +57,7 @@ class TShipment(Model):
     )
 
     receiver_address_id = Column(Integer, ForeignKey("t_address.id"))
-    receiver_address = relationship(
+    receiver_address: Mapped[TAddress] = relationship(
         "TAddress",
         backref="received_shipments",
         foreign_keys=[receiver_address_id],
@@ -68,7 +85,7 @@ class TShipmentDetail(Model):
     article = relationship("TArticle", backref="shipment_detail", uselist=False)
 
     shipment_id = Column(Integer, ForeignKey("t_shipment.id"))
-    shipment = relationship(
+    shipment: Mapped[TShipment] = relationship(
         "TShipment", backref="shipment_detail", uselist=False
     )
     quantity = Column(Integer)
@@ -102,25 +119,10 @@ class TCarrier(Model):
         return f"<TCarrier-{self.name}>"
 
 
-class TAddress(Model):
-    __tablename__ = "t_address"
-
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(100))
-    city_name = Column(String(50))
-    country_name = Column(String(20))
-    zip_code = Column(String(10))
-
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-    def __repr__(self):
-        return f"<TAddress-{self.zip_code}>"
-
-
 class TWeather(Model):
     __tablename__ = "t_weather"
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     temp = Column(Float)
     feels_like = Column(Float)
     temp_min = Column(Float)
@@ -130,7 +132,7 @@ class TWeather(Model):
     description = Column(String(50))
     units = Column(String(15))  # imperial, metric, standard
     zip_code = Column(String(10), unique=True, index=True)
-    modified_at = Column(
+    modified_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
